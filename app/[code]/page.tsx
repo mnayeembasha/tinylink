@@ -1,17 +1,30 @@
-import { notFound, redirect } from 'next/navigation';
+import { redirect } from "next/navigation";
+import {NotFound} from "@/components/NotFound";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic"; 
 
-export default async function RedirectPage({ params }: { params: { code: string } }) {
-  const link = await prisma.link.findUnique({ where: { code: params.code } });
+export default async function RedirectPage({
+  params,
+}: {
+  params: Promise<{ code: string }>;
+}) {
+  const { code } = await params; // ⬅ FIX: params is a promise
+
+  const link = await prisma.link.findUnique({
+    where: { code },
+  });
 
   if (!link) {
-    notFound();
+    return <NotFound/>
   }
 
   await prisma.link.update({
-    where: { code: params.code },
-    data: { clicks: { increment: 1 }, lastClicked: new Date() },
+    where: { code },
+    data: {
+      clicks: { increment: 1 },
+      lastClicked: new Date(),
+    },
   });
 
   redirect(link.url);
