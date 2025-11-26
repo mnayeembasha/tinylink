@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Copy, Trash2, Link2, ExternalLink, TrendingUp } from 'lucide-react';
+import { Copy, Trash2, Link2, ExternalLink, TrendingUp,ChartLine } from 'lucide-react';
 import { Toaster, toast } from 'react-hot-toast';
 import { Header } from '../components/Header';
 import { DeleteConfirmModal } from '../components/DeleteConfirmModal';
@@ -354,6 +354,14 @@ export default function Dashboard() {
                             Copy
                           </button>
 
+                          <button
+                            onClick={() => window.location.href = `/code/${link.code}`}
+                            className="flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm hover:shadow-md"
+                            title="View stats"
+                          >
+                            <ChartLine size={16} />
+                            Stats
+                          </button>
                           <button
                             onClick={() => openDeleteModal(link.code, link.url)}
                             className="flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm hover:shadow-md"
