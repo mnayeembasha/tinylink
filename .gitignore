@@ -39,3 +39,21 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Prisma Client (generated code)
+prisma/generated/
+lib/generated/prisma/
+node_modules/.prisma/
+node_modules/@prisma/client/
+
+# Prisma Engine binaries & cache
+.prisma/
+.prisma-engine/
+prisma/.env
+
+# Prisma migrations
+prisma/migrations/
+
+# TypeScript build output
+dist/
+build/
