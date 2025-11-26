@@ -1,7 +1,6 @@
 import { notFound, redirect } from 'next/navigation';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from "@/lib/prisma";
 
-const prisma = new PrismaClient();
 
 export default async function RedirectPage({ params }: { params: { code: string } }) {
   const link = await prisma.link.findUnique({ where: { code: params.code } });
