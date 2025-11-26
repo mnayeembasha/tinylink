@@ -15,14 +15,14 @@ export function Header() {
             </div>
           </div>
           <div className="hidden md:flex items-center gap-6 text-sm">
-            <div className="text-center">
+            {/*<div className="text-center">
               <div className="text-2xl font-bold">{0}</div>
               <div className="text-blue-200">Total Links</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold">{0}</div>
               <div className="text-blue-200">Total Clicks</div>
-            </div>
+            </div>*/}
           </div>
         </div>
       </div>

@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import { Copy, Trash2, Link2, ExternalLink, TrendingUp } from 'lucide-react';
 import { Toaster, toast } from 'react-hot-toast';
-import {Header} from '../components/Header';
-
+import { Header } from '../components/Header';
+import { DeleteConfirmModal } from '../components/DeleteConfirmModal';
 
 interface Link {
   id: string;
@@ -14,8 +14,6 @@ interface Link {
   lastClicked: string | null;
   createdAt: string;
 }
-
-
 
 export default function Dashboard() {
   const [links, setLinks] = useState<Link[]>([]);
@@ -27,6 +25,14 @@ export default function Dashboard() {
   const [formLoading, setFormLoading] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  
+  // Modal state
+  const [deleteModal, setDeleteModal] = useState({
+    isOpen: false,
+    linkCode: '',
+    linkUrl: '',
+  });
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     fetchLinks();
@@ -59,8 +65,8 @@ export default function Dashboard() {
       return;
     }
 
-    if (code && !/^[A-Za-z0-9]{6,8}$/.test(code)) {
-      setFormError('Invalid custom code (code should contain 6-8 alphanumeric characters)');
+    if (code && !/^[A-Za-z0-9]{6,12}$/.test(code)) {
+      setFormError('Invalid custom code (code should contain 6-12 alphanumeric characters)');
       setFormLoading(false);
       return;
     }
@@ -92,17 +98,35 @@ export default function Dashboard() {
     }
   }
 
-  async function handleDelete(code: string) {
-    if (!confirm('Are you sure you want to delete this link?')) return;
+  function openDeleteModal(code: string, url: string) {
+    setDeleteModal({
+      isOpen: true,
+      linkCode: code,
+      linkUrl: url,
+    });
+  }
 
+  function closeDeleteModal() {
+    setDeleteModal({
+      isOpen: false,
+      linkCode: '',
+      linkUrl: '',
+    });
+  }
+
+  async function confirmDelete() {
+    setIsDeleting(true);
     try {
-      const res = await fetch(`/api/links/${code}`, { method: 'DELETE' });
+      const res = await fetch(`/api/links/${deleteModal.linkCode}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Failed to delete');
 
       toast.success("Link deleted successfully!");
       fetchLinks();
+      closeDeleteModal();
     } catch (err: any) {
       toast.error(err.message);
+    } finally {
+      setIsDeleting(false);
     }
   }
 
@@ -148,6 +172,16 @@ export default function Dashboard() {
       }} />
 
       <Header />
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={deleteModal.isOpen}
+        onClose={closeDeleteModal}
+        onConfirm={confirmDelete}
+        linkCode={deleteModal.linkCode}
+        linkUrl={deleteModal.linkUrl}
+        isDeleting={isDeleting}
+      />
 
       <main className="max-w-7xl mx-auto px-4 py-8">
         {/* Stats Cards */}
@@ -222,9 +256,9 @@ export default function Dashboard() {
                 onChange={(e) => setCode(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
-                placeholder="e.g., abc123 (6-8 chars)"
+                placeholder="e.g., abc123 (6-12 chars)"
               />
-              <p className="text-xs text-gray-500 mt-1">6-8 alphanumeric characters</p>
+              <p className="text-xs text-gray-500 mt-1">6-12 alphanumeric characters</p>
             </div>
           </div>
 
@@ -321,7 +355,7 @@ export default function Dashboard() {
                           </button>
 
                           <button
-                            onClick={() => handleDelete(link.code)}
+                            onClick={() => openDeleteModal(link.code, link.url)}
                             className="flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm hover:shadow-md"
                             title="Delete link"
                           >
